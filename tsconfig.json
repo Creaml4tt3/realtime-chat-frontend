@@ -20,10 +20,18 @@
     ],
     "paths": {
       "@/*": ["./src/*"],
-      "@components/*": ["./src/app/components/*"],
-      "@utilities/*": ["./src/app/utilities/*"]
+      "@comp/*": ["./src/app/components/*"],
+      "@uti/*": ["./src/app/utilities/*"],
+      "@lib/*": ["./src/app/lib/*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    "custom.d.ts"
+  ],
+  // "types": ["./custom.d.ts"],
   "exclude": ["node_modules"]
 }
