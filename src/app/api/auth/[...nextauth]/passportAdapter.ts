@@ -1,5 +1,3 @@
-// import type { Adapter } from "next-auth/adapters";
-
 export async function authenticateWithPassport(
   credentials: CredentialPassport
 ) {

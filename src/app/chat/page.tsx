@@ -6,20 +6,16 @@ import { ConnectionManager } from "@comp/ConnectionManager";
 import { Events } from "@comp/Events";
 import { Form } from "@comp/Form";
 
+import { FetchMessage } from "@comp/data/FetchMessage";
+import { useSession } from "next-auth/react";
+
 export default function Chat() {
+  const { data: session, status } = useSession({
+    required: true,
+  });
   const [isConnected, setIsConnected] = useState(socket.connected);
   const [messages, setMessages] = useState([]);
   const [messageRecieves, setMessagesRecieves] = useState([]);
-
-  async function getMessage() {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_SERVER_ENDPOINT}/chat`
-    );
-    if (!response.ok) {
-      throw new Error("Failed to fetch messages");
-    }
-    return response.json();
-  }
 
   useEffect(() => {
     console.log(messages);
@@ -29,38 +25,42 @@ export default function Chat() {
   }, [isConnected]);
 
   useEffect(() => {
-    getMessage().then((data) => setMessages(data));
-
     function onConnect() {
       // socket.emit("user:connected", "user:");
       setIsConnected(true);
     }
-
     function onDisconnect() {
       setIsConnected(false);
     }
-
     function onMessage(data: any) {
       setMessagesRecieves((previous): any => [...previous, data]);
     }
 
-    socket.on("connect", onConnect);
-    socket.on("disconnect", onDisconnect);
-    socket.on("message:recieve", onMessage);
+    if (session && status === "authenticated") {
+      FetchMessage().then((data) => setMessages(data));
 
-    return () => {
-      socket.off("connect", onConnect);
-      socket.off("disconnect", onDisconnect);
-      socket.off("message:recieve", onMessage);
-    };
-  }, []);
+      socket.on("connect", onConnect);
+      socket.on("disconnect", onDisconnect);
+      socket.on("message:recieve", onMessage);
+
+      return () => {
+        socket.off("connect", onConnect);
+        socket.off("disconnect", onDisconnect);
+        socket.off("message:recieve", onMessage);
+      };
+    }
+  }, [session, status]);
 
   return (
-    <div className="App">
-      <ConnectionState isConnected={isConnected} />
-      <Events events={[...messages, ...messageRecieves]} />
-      <ConnectionManager />
-      <Form />
-    </div>
+    <>
+      {session && status === "authenticated" && (
+        <div className="App">
+          <ConnectionState isConnected={isConnected} />
+          <Events events={[...messages, ...messageRecieves]} />
+          <ConnectionManager />
+          <Form />
+        </div>
+      )}
+    </>
   );
 }

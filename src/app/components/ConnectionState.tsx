@@ -1,3 +1,4 @@
+"use client";
 import React from "react";
 
 interface ConnectionStateProps {
@@ -5,5 +6,5 @@ interface ConnectionStateProps {
 }
 
 export function ConnectionState({ isConnected }: ConnectionStateProps) {
-  return <div>State: {isConnected.toString()}</div>;
+  return <span>State: {isConnected ? "connected" : "not connected"}</span>;
 }

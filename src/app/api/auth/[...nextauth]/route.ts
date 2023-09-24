@@ -4,8 +4,8 @@ import { authenticateWithPassport } from "./passportAdapter";
 
 export const authOptions = {
   pages: {
-    // signIn: "/auth/login",
-    // signOut: "/auth/logout",
+    signIn: "/auth/login",
+    signOut: "/auth/logout",
   },
   providers: [
     CredentialsProvider({
