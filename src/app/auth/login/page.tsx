@@ -3,6 +3,7 @@ import { useEffect, useState, SyntheticEvent } from "react";
 import { useSession, signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useForm, SubmitHandler } from "react-hook-form";
+import GoogleSignin from "@/app/components/Google.component";
 
 interface LoginFormInput {
   email: string;
@@ -15,6 +16,14 @@ export default function Login() {
   const params = useSearchParams();
 
   const { register, handleSubmit } = useForm<LoginFormInput>();
+
+  const [isGoogle, setIsGoogle] = useState(false);
+  const handleGoogleOpen = () => {
+    setIsGoogle(true);
+  };
+  const handleGoogleClose = () => {
+    setIsGoogle(false);
+  };
 
   useEffect(() => {
     if (session && status === "authenticated") {
@@ -32,12 +41,20 @@ export default function Login() {
 
   return (
     <>
+      <button onClick={() => handleGoogleOpen()}>Google</button>
+      {isGoogle && <GoogleSignin close={handleGoogleClose} />}
       <form onSubmit={handleSubmit(onSubmit)}>
-        <input {...register("email", { required: true })} placeholder="Email" />
+        <input
+          type="email"
+          {...register("email", { required: true })}
+          placeholder="Email"
+          autoComplete="email"
+        />
         <input
           type="password"
           {...register("password", { required: true })}
           placeholder="Password"
+          autoComplete="current-password"
         />
         <button type="submit">Login</button>
       </form>

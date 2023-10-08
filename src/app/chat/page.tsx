@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { socket } from "@uti/socket";
+import { socket } from "@/app/lib/socket";
 import { ConnectionState } from "@comp/ConnectionState";
 import { ConnectionManager } from "@comp/ConnectionManager";
 import { Events } from "@comp/Events";
@@ -37,6 +37,7 @@ export default function Chat() {
     }
 
     if (session && status === "authenticated") {
+      console.log(session);
       FetchMessage().then((data) => setMessages(data));
 
       socket.on("connect", onConnect);

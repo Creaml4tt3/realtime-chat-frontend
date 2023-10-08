@@ -1,5 +1,5 @@
 import React from "react";
-import { socket } from "@uti/socket";
+import { socket } from "@/app/lib/socket";
 
 export function ConnectionManager() {
   function connect() {

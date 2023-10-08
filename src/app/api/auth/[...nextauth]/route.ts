@@ -1,5 +1,6 @@
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
+import GoogleProvider from "next-auth/providers/google";
 import { authenticateWithPassport } from "./passportAdapter";
 
 export const authOptions = {
@@ -29,19 +30,56 @@ export const authOptions = {
         }
       },
     }),
+    GoogleProvider({
+      clientId: process.env.NEXTAUTH_GOOGLE_CLIENT_ID || "",
+      clientSecret: process.env.NEXTAUTH_GOOGLE_CLIENT_SECRET || "",
+    }),
   ],
   callbacks: {
-    async jwt({ token, user }: any) {
+    async jwt({ token, user, account, profile }: any) {
       if (user) {
         token.user = user;
+      }
+      if (account && account.provider === "google" && profile && profile.user) {
+        token.user = profile.user;
       }
       return token;
     },
     async session({ session, token }: any) {
       if (token) {
+        if (token.user.image) {
+          token.user.photo = token.user.image;
+          delete token.user.image;
+        }
         session.user = token.user;
         return session;
       }
+    },
+    async signIn({ account, profile }: any) {
+      if (account.provider === "google") {
+        if (profile.email_verified) {
+          try {
+            const response = await fetch(
+              `${process.env.NEXT_PUBLIC_SERVER_ENDPOINT}/auth/google`,
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify(profile),
+              }
+            );
+
+            const data = await response.json();
+            profile.user = data?.user;
+            return true;
+          } catch (error) {
+            console.error("Error authenticating with Google:", error);
+            return null;
+          }
+        }
+      }
+      return true;
     },
     async redirect({ url, baseUrl }: any) {
       if (url.startsWith("/")) return `${baseUrl}${url}`;

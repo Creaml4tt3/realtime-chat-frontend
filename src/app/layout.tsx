@@ -2,7 +2,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { Session } from "next-auth";
-import SessionWrapper from "@lib/SessionWrapper";
+import SessionWrapper from "@/app/components/wrapper/SessionWrapper";
 
 const inter = Inter({ subsets: ["latin"] });
 
